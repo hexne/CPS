@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.30)
 project(CPS)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
@@ -11,6 +11,7 @@ target_sources(Modules
         PUBLIC
         FILE_SET cxx_modules TYPE CXX_MODULES FILES
         Param.cppm
+        LexicalAnalysis.cppm
 )
 
 
