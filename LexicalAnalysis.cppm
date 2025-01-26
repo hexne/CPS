@@ -6,26 +6,28 @@
 module;
 #include <string_view>
 #include <generator>
-#include <iostream>
+#include <variant>
 export module LexicalAnalysis;
 
 enum class TokenType {
-    Number , Function, Sys, Glo, Loc, Id,
+    Number , Variable, Function, Sys, Glo, Loc, Id,
     Char, Else, Enum, If, Int, Return, Sizeof, While,
     Assign, Cond, Lor, Lan, Or, Xor, And, Eq, Ne, Lt, Gt, Le, Ge, Shl, Shr, Add, Sub, Mul, Div, Mod, Inc, Dec, Brak
 };
 class TokenValue {
-    int value{};
-
+    std::variant<int,std::string> value;
 
 public:
-    TokenValue& operator = (const int val) {
+    template <typename T>
+    TokenValue& operator = (const T& val) {
         value = val;
         return *this;
     }
-
     operator int() const {
-        return value;
+        return std::get<int>(value);
+    }
+    operator std::string() const {
+        return std::get<std::string>(value);
     }
 };
 
@@ -73,7 +75,18 @@ public:
                 co_yield { TokenType::Number, token_value };
             }
 
-            //
+            // 变量、内置关键字
+            else if (std::isalpha(*src_) || *src_ == '_') {
+                TokenValue token_value;
+                std::string name;
+                name += *src_++;
+                while (src_ != context_.end() && (std::isalpha(*src_) || *src_ == '_')) {
+                    name += *src_ ++;
+                }
+                token_value = name;
+                co_yield { TokenType::Variable, token_value };
+            }
+
         }
     }
 

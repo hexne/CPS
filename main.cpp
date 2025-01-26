@@ -17,10 +17,10 @@ int main(const int argc, char const* argv[]) {
     }
     // 仅为命令行模式
     else {
-        LexicalAnalysis lexical_analysis("011");
+        LexicalAnalysis lexical_analysis("temp");
 
         for (auto token : lexical_analysis.next()) {
-            std::cout << token.value << std::endl;
+            std::cout << std::string(token.value) << std::endl;
         }
 
         
