@@ -7,6 +7,7 @@ module;
 #include <string_view>
 #include <generator>
 #include <variant>
+#include <vector>
 export module LexicalAnalysis;
 
 enum class TokenType {
@@ -39,6 +40,7 @@ struct Token {
 export class LexicalAnalysis {
     std::string_view context_;
     std::string_view::iterator src_;
+    size_t cur_line_{};
 
 public:
 
@@ -84,9 +86,39 @@ public:
                     name += *src_ ++;
                 }
                 token_value = name;
+
+                static std::vector<std::string> keywords = {
+                    "if", "else", "for", "while", "break", "continue",
+                    "char", "unsigned" , "int", "float", "double", "long", "signed", "void"
+                };
+
+                // @TODO 定义内置关键字, 并识别处理
                 co_yield { TokenType::Variable, token_value };
             }
 
+            // 其他字符
+            else switch (*src_) {
+            case '\n':
+                cur_line_ ++;
+                break;
+            case '#':
+                while (src_ != context_.end() && *src_ != '\n') {
+                    ; // @TODO, 头文件
+                }
+                break;
+            case '/':
+                //
+                if (src_ != context_.end() && *src_ == '/') {
+                    while (src_ != context_.end() && *src_ != '\n')
+                        src_ ++;
+                }
+                else {
+                    co_yield {TokenType::Div, TokenValue{}};
+                }
+                break;
+            default:
+                break;
+            }
         }
     }
 
